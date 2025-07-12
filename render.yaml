@@ -6,8 +6,8 @@ services:
     startCommand: python main.py
     envVars:
       - key: TELEGRAM_BOT_TOKEN
-        value: your_actual_bot_token_here
+        value: 7862695756:AAHfJlGRWXHlkKRiwfVw1f2r3Aj4QuhdFTo
       - key: TELEGRAM_CHAT_ID
-        value: your_actual_chat_id_here
+        value: 5246794723
 
 
