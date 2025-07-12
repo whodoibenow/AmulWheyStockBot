@@ -10,11 +10,12 @@
 #       - key: TELEGRAM_CHAT_ID
 #         value: 5246794723
 
-
 services:
   - type: worker
-    name: amul-availability-bot
+    name: amul-bot
     env: python
     buildCommand: ./install_chrome.sh && pip install -r requirements.txt
     startCommand: python main.py
     plan: free
+    envVars:
+      PYTHON_VERSION: 3.11.8
