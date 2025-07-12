@@ -3,7 +3,7 @@ services:
     name: amul-stock-bot
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: python main.py
+    startCommand: amul_bot.py
     envVars:
       - key: TELEGRAM_BOT_TOKEN
         value: 7862695756:AAHfJlGRWXHlkKRiwfVw1f2r3Aj4QuhdFTo
