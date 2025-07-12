@@ -1,13 +1,20 @@
+# services:
+#   - type: worker
+#     name: amul-stock-bot
+#     env: python
+#     buildCommand: pip install -r requirements.txt
+#     startCommand: python amul_bot.py
+#     envVars:
+#       - key: TELEGRAM_BOT_TOKEN
+#         value: 7862695756:AAHfJlGRWXHlkKRiwfVw1f2r3Aj4QuhdFTo
+#       - key: TELEGRAM_CHAT_ID
+#         value: 5246794723
+
+
 services:
   - type: worker
-    name: amul-stock-bot
+    name: amul-availability-bot
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: python amul_bot.py
-    envVars:
-      - key: TELEGRAM_BOT_TOKEN
-        value: 7862695756:AAHfJlGRWXHlkKRiwfVw1f2r3Aj4QuhdFTo
-      - key: TELEGRAM_CHAT_ID
-        value: 5246794723
-
-
+    buildCommand: ./install_chrome.sh && pip install -r requirements.txt
+    startCommand: python main.py
+    plan: free
