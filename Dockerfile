@@ -1,18 +1,17 @@
-FROM python:3.11-slim
+FROM ghcr.io/puppeteer/puppeteer:latest
 
-# Install Chrome
-COPY install_chrome.sh /install_chrome.sh
-RUN chmod +x /install_chrome.sh && /install_chrome.sh
+# Install Python
+RUN apt-get update && apt-get install -y python3 python3-pip
 
-# Set display for headless chrome
-ENV DISPLAY=:99
+# Set Python alias
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
 # Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy your script
+# Copy source
 COPY main.py .
 
-# Run the script
+# Run your bot
 CMD ["python", "main.py"]
