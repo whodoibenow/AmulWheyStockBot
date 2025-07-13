@@ -98,8 +98,77 @@
 
 
 
+# import os
+# import time
+# from selenium import webdriver
+# from selenium.webdriver.common.by import By
+# from selenium.webdriver.chrome.service import Service
+# from selenium.webdriver.support.ui import WebDriverWait
+# from selenium.webdriver.support import expected_conditions as EC
+# from selenium.common.exceptions import NoSuchElementException
+# from webdriver_manager.chrome import ChromeDriverManager
+# import telegram
+
+# # CONFIG
+# PRODUCT_URL = "https://shop.amul.com/en/product/amul-whey-protein-32-g-or-pack-of-60-sachets"
+# PINCODE = "388120"
+# BOT_TOKEN = "7862695756:AAHfJlGRWXHlkKRiwfVw1f2r3Aj4QuhdFTo"
+# CHAT_ID = "5246794723"
+# bot = telegram.Bot(token=BOT_TOKEN)
+
+# def send_telegram_message(msg):
+#     bot.send_message(chat_id=CHAT_ID, text=msg)
+
+# def check_availability():
+#     options = webdriver.ChromeOptions()
+#     options.add_argument("--headless")
+#     options.add_argument("--no-sandbox")
+#     options.add_argument("--disable-dev-shm-usage")
+#     options.add_argument("--window-size=1920,1080")
+
+#     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+#     driver.get(PRODUCT_URL)
+
+#     wait = WebDriverWait(driver, 15)
+
+#     try:
+#         print("🔍 Waiting for PIN code input...")
+#         pincode_input = wait.until(EC.presence_of_element_located((By.ID, "search")))
+#         pincode_input.clear()
+#         pincode_input.send_keys(PINCODE)
+
+#         print("⏳ Waiting for dropdown...")
+#         dropdown_option = wait.until(EC.element_to_be_clickable(
+#             (By.XPATH, f"//p[contains(@class,'item-name') and text()='{PINCODE}']")))
+#         dropdown_option.click()
+#         print("✅ Pincode selected.")
+
+#         time.sleep(5)
+
+#         try:
+#             sold_out_alert = driver.find_element(By.XPATH, "//div[contains(@class, 'alert-danger') and contains(text(), 'Sold Out')]")
+#             print("❌ Product is SOLD OUT.")
+#         except NoSuchElementException:
+#             print("✅ Product is AVAILABLE!")
+#             send_telegram_message("🎉 Product is AVAILABLE! Go buy it now!\n" + PRODUCT_URL)
+
+#     except Exception as e:
+#         print("❌ Error occurred:", e)
+
+#     finally:
+#         driver.quit()
+
+# if __name__ == "__main__":
+#     while True:
+#         check_availability()
+#         time.sleep(60)
+
+
+
 import os
 import time
+import asyncio
+import telegram
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -107,21 +176,23 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
-import telegram
 
-# CONFIG
+# === CONFIGURATION ===
 PRODUCT_URL = "https://shop.amul.com/en/product/amul-whey-protein-32-g-or-pack-of-60-sachets"
 PINCODE = "388120"
-BOT_TOKEN = "7862695756:AAHfJlGRWXHlkKRiwfVw1f2r3Aj4QuhdFTo"
-CHAT_ID = "5246794723"
-bot = telegram.Bot(token=BOT_TOKEN)
+TELEGRAM_BOT_TOKEN = os.getenv("BOT_TOKEN", "7862695756:AAHfJlGRWXHlkKRiwfVw1f2r3Aj4QuhdFTo")
+TELEGRAM_CHAT_ID = os.getenv("CHAT_ID", "5246794723")
+# ======================
+
+bot = telegram.Bot(token=TELEGRAM_BOT_TOKEN)
 
 def send_telegram_message(msg):
-    bot.send_message(chat_id=CHAT_ID, text=msg)
+    asyncio.run(bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=msg))
 
 def check_availability():
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
+    options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--window-size=1920,1080")
@@ -136,6 +207,7 @@ def check_availability():
         pincode_input = wait.until(EC.presence_of_element_located((By.ID, "search")))
         pincode_input.clear()
         pincode_input.send_keys(PINCODE)
+        print("⌨️ PIN code entered...")
 
         print("⏳ Waiting for dropdown...")
         dropdown_option = wait.until(EC.element_to_be_clickable(
@@ -146,7 +218,7 @@ def check_availability():
         time.sleep(5)
 
         try:
-            sold_out_alert = driver.find_element(By.XPATH, "//div[contains(@class, 'alert-danger') and contains(text(), 'Sold Out')]")
+            driver.find_element(By.XPATH, "//div[contains(@class, 'alert-danger') and contains(text(), 'Sold Out')]")
             print("❌ Product is SOLD OUT.")
         except NoSuchElementException:
             print("✅ Product is AVAILABLE!")
@@ -158,8 +230,12 @@ def check_availability():
     finally:
         driver.quit()
 
+
+# Run every 1 minute
 if __name__ == "__main__":
+    send_telegram_message("🤖 Bot has started monitoring stock...")
     while True:
         check_availability()
+        print("⏱️ Waiting 1 minute before next check...")
         time.sleep(60)
 
